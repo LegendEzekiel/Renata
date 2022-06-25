@@ -185,13 +185,13 @@ local function LoadMenu()
 
         MenuConfig['Combo']['Use Q Objcet'][enemy.charName] = qCharMenu:AddCheckBox('use', AutoLanguage('Use Q1'));
         MenuConfig['Combo']['Use Q2 Objcet'][enemy.charName] = qCharMenu:AddCheckBox('use2', AutoLanguage('Use Q2'));
-
+        MenuConfig['Combo']['Use Q Check'][enemy.charName] = qCharMenu:AddCheckBox('usecheck', AutoLanguage('Check Olny Push To Enemy  Use'), false);
         if enemy.isMelee then
             MenuConfig['Combo']['Use Q Mode'][enemy.charName] = qCharMenu:AddList("model", "Q Model", { AutoLanguage("Pull To My Or Pull To (Turret Down) Mode:0"), AutoLanguage("Push Away Or Push To(Turret Down) Or Push To Enemy Mode:1"), AutoLanguage("Pull To My Or Push To (Turret Down) Or Push To Enemy Mode:2") }, 1);
-            MenuConfig['Combo']['Use Q Check'][enemy.charName] = qCharMenu:AddCheckBox('usecheck', AutoLanguage('Check Olny Push To Enemy  Use'), true);
+
         else
             MenuConfig['Combo']['Use Q Mode'][enemy.charName] = qCharMenu:AddList("model", "Q Model", { AutoLanguage("Pull To My Or Pull To (Turret Down) Mode:0"), AutoLanguage("Push Away Or Push To(Turret Down) Or Push To Enemy Mode:1"), AutoLanguage("Pull To My Or Push To (Turret Down) Or Push To Enemy Mode:2") }, 2);
-            MenuConfig['Combo']['Use Q Check'][enemy.charName] = qCharMenu:AddCheckBox('usecheck', AutoLanguage('Check Olny Push To Enemy  Use'), false);
+
         end
 
 
@@ -299,7 +299,7 @@ local function UseQBindPred()
 
                                 if MenuConfig['Combo']['Use Q Check'][T.charName].value and Q2Mode ~= 0 and myIsEnemyRange >= 300 then
                                     if t2 then
-                                        Q:Cast(Pred.castPosition);
+                                        Q:Cast(t2.position);
                                     end
 
                                 else
@@ -577,7 +577,7 @@ local function ontick()
         return ;
     end
 
-    UseQ2();
+    --UseQ2();
 
     if MenuConfig['Auto']['Auto W'].value then
         AutoWLogicHP();
@@ -585,13 +585,13 @@ local function ontick()
 
     if Champions.Combo then
         Combo();
-        --UseQ2();
+        UseQ2();
     end
 
     if Champions.Harass then
 
         Harass();
-        --UseQ2();
+        UseQ2();
 
     end
 
