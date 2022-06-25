@@ -48,6 +48,7 @@ MenuConfig = {
     ["Combo"] = {
         ['Use Q'] = nil;
         ['Use Q2'] = nil;
+        ['Use Q Check'] = { };
         ['Use Q Objcet'] = {};
         ['Use Q2 Objcet'] = {};
         ['Use Q Mode'] = {};
@@ -144,7 +145,7 @@ local function AutoLanguage(str)
 
     if i_lg == 1 then
         --中文
-     local  strR = string.gsub(str, "Combo", "连招");
+        local strR = string.gsub(str, "Combo", "连招");
         strR = string.gsub(strR, "Settings", "设置");
         strR = string.gsub(strR, "Use", "使用");
         strR = string.gsub(strR, "Enemy", "敌方");
@@ -163,7 +164,8 @@ local function AutoLanguage(str)
         strR = string.gsub(strR, "Pred", "预测");
         strR = string.gsub(strR, "Damage", "伤害值");
         strR = string.gsub(strR, "Current", "当前");
-
+        strR = string.gsub(strR, "Cast", "施法");
+        strR = string.gsub(strR, "Check", "检查");
         return strR;
 
     end
@@ -183,11 +185,15 @@ local function LoadMenu()
 
         MenuConfig['Combo']['Use Q Objcet'][enemy.charName] = qCharMenu:AddCheckBox('use', AutoLanguage('Use Q1'));
         MenuConfig['Combo']['Use Q2 Objcet'][enemy.charName] = qCharMenu:AddCheckBox('use2', AutoLanguage('Use Q2'));
+
         if enemy.isMelee then
-            MenuConfig['Combo']['Use Q Mode'][enemy.charName] = qCharMenu:AddList("model", "Q Model", { AutoLanguage("Pull To My Or Pull To (Turret Down)"), AutoLanguage("Push Away Or Push To(Turret Down) Or Push To Enemy"), AutoLanguage("Pull To My Or Push To (Turret Down) Or Push To Enemy") }, 1);
+            MenuConfig['Combo']['Use Q Mode'][enemy.charName] = qCharMenu:AddList("model", "Q Model", { AutoLanguage("Pull To My Or Pull To (Turret Down) Mode:0"), AutoLanguage("Push Away Or Push To(Turret Down) Or Push To Enemy Mode:1"), AutoLanguage("Pull To My Or Push To (Turret Down) Or Push To Enemy Mode:2") }, 1);
+            MenuConfig['Combo']['Use Q Check'][enemy.charName] = qCharMenu:AddCheckBox('usecheck', AutoLanguage('Check Olny Push To Enemy  Use'), true);
         else
-            MenuConfig['Combo']['Use Q Mode'][enemy.charName] = qCharMenu:AddList("model", "Q Model", { AutoLanguage("Pull To My Or Pull To (Turret Down)"), AutoLanguage("Push Away Or Push To(Turret Down) Or Push To Enemy"), AutoLanguage("Pull To My Or Push To (Turret Down) Or Push To Enemy") }, 2);
+            MenuConfig['Combo']['Use Q Mode'][enemy.charName] = qCharMenu:AddList("model", "Q Model", { AutoLanguage("Pull To My Or Pull To (Turret Down) Mode:0"), AutoLanguage("Push Away Or Push To(Turret Down) Or Push To Enemy Mode:1"), AutoLanguage("Pull To My Or Push To (Turret Down) Or Push To Enemy Mode:2") }, 2);
+            MenuConfig['Combo']['Use Q Check'][enemy.charName] = qCharMenu:AddCheckBox('usecheck', AutoLanguage('Check Olny Push To Enemy  Use'), false);
         end
+
 
     end
     MenuConfig['Combo']['Use Q2'] = Combo:AddCheckBox("useQ2", AutoLanguage('Use Q2'));
@@ -257,6 +263,18 @@ local function LoadMenu()
 end
 
 LoadMenu();
+local function GetEnemyQ2(T)
+
+    for _, t in ObjectManager.enemyHeroes:pairs() do
+        if T.position:Distance(t.position) <= 400 and t.networkId ~= T.networkId then
+            return t;
+        end
+    end
+
+    return nil;
+
+end
+
 local function UseQBindPred()
 
     if Q:Ready() then
@@ -267,13 +285,37 @@ local function UseQBindPred()
             if T then
                 if MenuConfig['Combo']['Use Q Objcet'][T.charName].value then
                     if T:IsValidTarget(Q.range) then
-                        local Pred = Q:GetPrediction(T);
-                        if Pred and Pred.hitchance >= HitChance.High then
-                            if My.position:Distance(Pred.castPosition) <= Q.range then
-                                Q:Cast(Pred.castPosition);
-                            end
+                        local Q2Mode = MenuConfig['Combo']['Use Q Mode'][T.charName].value;
+                        local t2 = nil;
+                        if MenuConfig['Combo']['Use Q Check'][T.charName].value then
+                            t2 = GetEnemyQ2(T);
                         end
+
+                        local Pred = Q:GetPrediction(T);
+
+                        if Pred and Pred.hitchance >= HitChance.High then
+                            local myIsEnemyRange = My.position:Distance(Pred.castPosition);
+                            if myIsEnemyRange <= Q.range then
+
+                                if MenuConfig['Combo']['Use Q Check'][T.charName].value and Q2Mode ~= 0 and myIsEnemyRange >= 300 then
+                                    if t2 then
+                                        Q:Cast(Pred.castPosition);
+                                    end
+
+                                else
+                                    Q:Cast(Pred.castPosition);
+                                end
+
+
+                            end
+
+
+                        end
+
+
                     end
+
+
                 end
 
             end
@@ -360,21 +402,6 @@ local function Combo()
     --end
 end
 
-local function GetEnemyQ2(T)
-
-    for _, t in ObjectManager.enemyHeroes:pairs() do
-
-
-        if T.position:Distance(t.position) <= 400 and t.networkId ~= T.networkId then
-            return t;
-        end
-
-    end
-
-    return nil;
-
-end
-
 local function GetTurr(Tg)
 
 
@@ -423,6 +450,30 @@ local function Q2(t)
                                 Q:Cast(turr.position);
                                 return ;
                             else
+
+                                local HpB = (t.totalHealth / t.totalMaxHealth) * 100;
+                                if t.totalMaxHealth >= 3000 then
+                                    if HpB <= 15 then
+                                        Q:Cast(My.position);
+                                        return ;
+                                    end
+                                elseif t.totalMaxHealth >= 2000 then
+                                    if HpB <= 20 then
+                                        Q:Cast(My.position);
+                                        return ;
+                                    end
+                                elseif t.totalMaxHealth >= 1000 then
+                                    if HpB <= 30 then
+                                        Q:Cast(My.position);
+                                        return ;
+                                    end
+                                else
+                                    if HpB <= 30 then
+                                        Q:Cast(My.position);
+                                        return ;
+                                    end
+                                end
+
                                 local CastPos = My.position:RelativePos(t.position, 20000)
                                 Q:Cast(CastPos);
                                 return ;
@@ -534,12 +585,13 @@ local function ontick()
 
     if Champions.Combo then
         Combo();
-
+        --UseQ2();
     end
 
     if Champions.Harass then
 
         Harass();
+        --UseQ2();
 
     end
 
