@@ -144,11 +144,8 @@ local function AutoLanguage(str)
 
     if i_lg == 1 then
         --中文
-
-        local strR = string.gsub(str, "Combo", "连招");
-
+     local  strR = string.gsub(str, "Combo", "连招");
         strR = string.gsub(strR, "Settings", "设置");
-
         strR = string.gsub(strR, "Use", "使用");
         strR = string.gsub(strR, "Enemy", "敌方");
         strR = string.gsub(strR, "Auto", "自动");
@@ -170,7 +167,7 @@ local function AutoLanguage(str)
         return strR;
 
     end
-
+    return str;
 
 end
 
