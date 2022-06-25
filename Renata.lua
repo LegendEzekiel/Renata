@@ -132,26 +132,68 @@ local function Init()
     R = Champions.R;
 end
 
+local function AutoLanguage(str)
+
+
+    local i_lg = UI:GetLanguage(); --0=英语  1=中文
+    if i_lg == 0 then
+        --英语
+
+        return str;
+    end
+
+    if i_lg == 1 then
+        --中文
+
+        local strR = string.gsub(str, "Combo", "连招");
+
+        strR = string.gsub(strR, "Settings", "设置");
+
+        strR = string.gsub(strR, "Use", "使用");
+        strR = string.gsub(strR, "Enemy", "敌方");
+        strR = string.gsub(strR, "Auto", "自动");
+        strR = string.gsub(strR, "Range", "范围");
+        strR = string.gsub(strR, "Drawing", "绘制");
+        strR = string.gsub(strR, "Olny", "仅");
+        strR = string.gsub(strR, "Pull", "拉");
+        strR = string.gsub(strR, "Turret", "塔");
+        strR = string.gsub(strR, "Or", "或");
+        strR = string.gsub(strR, "Push", "推");
+        strR = string.gsub(strR, "Away", "走");
+        strR = string.gsub(strR, "To", "到");
+        strR = string.gsub(strR, "Down", "下");
+        strR = string.gsub(strR, "My", "自己");
+        strR = string.gsub(strR, "Pred", "预测");
+        strR = string.gsub(strR, "Damage", "伤害值");
+        strR = string.gsub(strR, "Current", "当前");
+
+        return strR;
+
+    end
+
+
+end
+
 local function LoadMenu()
 
 
-    local Combo = Menu:AddMenu("Combo", "Combo");
-    MenuConfig['Combo']['Use Q'] = Combo:AddCheckBox("useQ", 'Use Q');
+    local Combo = Menu:AddMenu("Combo", AutoLanguage("Combo"));
+    MenuConfig['Combo']['Use Q'] = Combo:AddCheckBox("useQ", AutoLanguage('Use Q'));
 
-    local WhitelistQ = Combo:AddMenu("QSettings", "Q Settings");
+    local WhitelistQ = Combo:AddMenu("QSettings", AutoLanguage("Q Settings"));
     for _, enemy in ObjectManager.enemyHeroes:pairs() do
         local qCharMenu = WhitelistQ:AddMenu(enemy.charName .. "Menu", enemy.charName);
 
-        MenuConfig['Combo']['Use Q Objcet'][enemy.charName] = qCharMenu:AddCheckBox('use', "Use Q1");
-        MenuConfig['Combo']['Use Q2 Objcet'][enemy.charName] = qCharMenu:AddCheckBox('use2', "Use Q2");
+        MenuConfig['Combo']['Use Q Objcet'][enemy.charName] = qCharMenu:AddCheckBox('use', AutoLanguage('Use Q1'));
+        MenuConfig['Combo']['Use Q2 Objcet'][enemy.charName] = qCharMenu:AddCheckBox('use2', AutoLanguage('Use Q2'));
         if enemy.isMelee then
-            MenuConfig['Combo']['Use Q Mode'][enemy.charName] = qCharMenu:AddList("model", "Q Model", { "Olny Pull(Turret)", "Push(Turret) Or Push To Enemy", "Pull(Turret) Or Push To Enemy" }, 1);
+            MenuConfig['Combo']['Use Q Mode'][enemy.charName] = qCharMenu:AddList("model", "Q Model", { AutoLanguage("Pull To My Or Pull To (Turret Down)"), AutoLanguage("Push Away Or Push To(Turret Down) Or Push To Enemy"), AutoLanguage("Pull To My Or Push To (Turret Down) Or Push To Enemy") }, 1);
         else
-            MenuConfig['Combo']['Use Q Mode'][enemy.charName] = qCharMenu:AddList("model", "Q Model", { "Olny Pull(Turret)", "Push(Turret) Or Push To Enemy", "Pull(Turret) Or Push To Enemy" }, 2);
+            MenuConfig['Combo']['Use Q Mode'][enemy.charName] = qCharMenu:AddList("model", "Q Model", { AutoLanguage("Pull To My Or Pull To (Turret Down)"), AutoLanguage("Push Away Or Push To(Turret Down) Or Push To Enemy"), AutoLanguage("Pull To My Or Push To (Turret Down) Or Push To Enemy") }, 2);
         end
 
     end
-    MenuConfig['Combo']['Use Q2'] = Combo:AddCheckBox("useQ2", 'Use Q2');
+    MenuConfig['Combo']['Use Q2'] = Combo:AddCheckBox("useQ2", AutoLanguage('Use Q2'));
 
     --MenuConfig['Combo']['Use W'] = Combo:AddCheckBox("useW", 'Use W');
     --local Wmenu = Combo:AddMenu("Wsetting", "W Settings");
@@ -165,47 +207,47 @@ local function LoadMenu()
     --
     --end
 
-    MenuConfig['Combo']['Use E'] = Combo:AddCheckBox("useE", 'Use E');
+    MenuConfig['Combo']['Use E'] = Combo:AddCheckBox("useE", AutoLanguage('Use E'));
 
-    MenuConfig['Combo']['Use R'] = Combo:AddCheckBox("useR", 'Use R');
+    MenuConfig['Combo']['Use R'] = Combo:AddCheckBox("useR", AutoLanguage('Use R'));
     MenuConfig['Combo']['Use Key R'] = Combo:AddKeyBind("keyR", ("Key R"), 84, false, false);
     MenuConfig['Combo']['Use Key R']:PermaShow(true, true);
-    MenuConfig['Combo']['Use R Number'] = Combo:AddSlider("useRrange", 'Use R >= X Enemy', 3, 1, 5)
+    MenuConfig['Combo']['Use R Number'] = Combo:AddSlider("useRrange", AutoLanguage('Use R >= X Enemy'), 3, 1, 5)
 
     MenuConfig['Combo']['Use R Number']:PermaShow(true, true);
 
     local Harass = Menu:AddMenu("Harass", "Harass");
-    MenuConfig['Harass']['Use Q'] = Harass:AddCheckBox("useQ", 'Use Q')
-    MenuConfig['Harass']['Use E'] = Harass:AddCheckBox("useE", 'Use E');
+    MenuConfig['Harass']['Use Q'] = Harass:AddCheckBox("useQ", AutoLanguage('Use Q'))
+    MenuConfig['Harass']['Use E'] = Harass:AddCheckBox("useE", AutoLanguage('Use E'));
 
     local Auto = Menu:AddMenu("Auto", "Auto");
-    MenuConfig['Auto']['Auto W'] = Auto:AddCheckBox("autoW", 'Auto W');
+    MenuConfig['Auto']['Auto W'] = Auto:AddCheckBox("autoW", AutoLanguage('Auto W'));
 
-    local autoWsettings = Auto:AddMenu("Wsetting", "W Settings");
+    local autoWsettings = Auto:AddMenu("Wsetting", AutoLanguage("W Settings"));
 
     for _, ally in ObjectManager.allyHeroes:pairs() do
         local autoCharMenu = autoWsettings:AddMenu(ally.charName .. "Menu", ally.charName);
 
-        MenuConfig['Auto']['Use W Objcet'][ally.charName] = autoCharMenu:AddCheckBox(ally.charName .. "Use", "Use");
+        MenuConfig['Auto']['Use W Objcet'][ally.charName] = autoCharMenu:AddCheckBox(ally.charName .. "Use", AutoLanguage("Use"))
 
         MenuConfig['Auto']['Use W HP'][ally.charName] = autoCharMenu:AddSlider(ally.charName .. "HP", "Hp <= X%", 15, 1, 100);
 
-        MenuConfig['Auto']['Use W Perd'][ally.charName] = autoCharMenu:AddCheckBox(ally.charName .. "Perd", "Pred Damage >= Current HP Use");
+        MenuConfig['Auto']['Use W Perd'][ally.charName] = autoCharMenu:AddCheckBox(ally.charName .. "Perd", AutoLanguage("Pred Damage >= Current HP Use"));
 
 
     end
 
-    local UseRange = Menu:AddMenu("useRange", "Use Range Settings");
-    MenuConfig['Use Range']['Q'] = UseRange:AddSlider("useQRange", 'Use Q Range', 800, 1, 900, 10, function(s)
+    local UseRange = Menu:AddMenu("useRange", AutoLanguage("Use Range Settings"));
+    MenuConfig['Use Range']['Q'] = UseRange:AddSlider("useQRange", AutoLanguage('Use Q Range'), 800, 1, 900, 10, function(s)
         Champions.Q = (SDKSpell.Create(SpellSlot.Q, MenuConfig['Use Range']['Q'].value, DamageType.Magical))
     end)
-    MenuConfig['Use Range']['W'] = UseRange:AddSlider("useWRange", 'Use W Range', 800, 1, 800, 1, function(s)
+    MenuConfig['Use Range']['W'] = UseRange:AddSlider("useWRange", AutoLanguage('Use W Range'), 800, 1, 800, 1, function(s)
         Champions.W = (SDKSpell.Create(SpellSlot.W, MenuConfig['Use Range']['W'].value, DamageType.Magical))
     end)
-    MenuConfig['Use Range']['E'] = UseRange:AddSlider("useERange", 'Use E Range', 800, 1, 800, 1, function(s)
+    MenuConfig['Use Range']['E'] = UseRange:AddSlider("useERange", AutoLanguage('Use E Range'), 800, 1, 800, 1, function(s)
         Champions.E = (SDKSpell.Create(SpellSlot.E, MenuConfig['Use Range']['E'].value, DamageType.Magical))
     end)
-    MenuConfig['Use Range']['R'] = UseRange:AddSlider("useRRange", 'Use R Range', 800, 1, 2000, 10, function(s)
+    MenuConfig['Use Range']['R'] = UseRange:AddSlider("useRRange", AutoLanguage('Use R Range'), 800, 1, 2000, 10, function(s)
         Champions.R = (SDKSpell.Create(SpellSlot.R, MenuConfig['Use Range']['R'].value, DamageType.Magical))
     end)
 
@@ -393,7 +435,9 @@ local function Q2(t)
                     end
 
                     if Q2Mode == 2 then
+
                         local mode_1 = GetEnemyQ2(t);
+
                         if mode_1 then
                             Q:Cast(mode_1.position);
                             return ;
@@ -438,8 +482,9 @@ local function AutoWLogicHP()
 
     if W:Ready() then
         for _, ally in ObjectManager.allyHeroes:pairs() do
-
-            if My.position:Distance(ally.position)<=W.range then
+            --print(My.position:Distance(ally.position));
+            --print(W.range);
+            if My.position:Distance(ally.position) <= W.range and ally.isAlive then
                 if ally.isAlive and MenuConfig['Auto']['Use W Objcet'][ally.charName].value then
                     local HpB = (ally.totalHealth / ally.totalMaxHealth) * 100;
                     local SetHpB = MenuConfig['Auto']['Use W HP'][ally.charName].value;
@@ -513,12 +558,12 @@ end
 Callback.Bind(CallbackType.OnTick, ontick)
 
 local fontSize = 16
-Callback.Bind(CallbackType.OnImguiDraw, function()
-    local dmg = HealthPrediction.GetIncomingDamage(Game.localPlayer, 0.1, true, true)
-    local text = string.format("Damage: %d", dmg)
-    local tX, tY = Renderer.CalcTextSize(text, fontSize)
-    Renderer.DrawWorldText(text, Game.localPlayer.position, Math.Vector2(-tX / 2, 0), fontSize)
-end)
+--Callback.Bind(CallbackType.OnImguiDraw, function()
+--    local dmg = HealthPrediction.GetIncomingDamage(Game.localPlayer, 0.1, true, true)
+--    local text = string.format("Damage: %d", dmg)
+--    local tX, tY = Renderer.CalcTextSize(text, fontSize)
+--    Renderer.DrawWorldText(text, Game.localPlayer.position, Math.Vector2(-tX / 2, 0), fontSize)
+--end)
 
 
 
