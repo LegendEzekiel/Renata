@@ -350,10 +350,10 @@ end
 
 local function UseE()
     if E:Ready() then
-        local T = TargetSelector.GetTarget(Q.range, DamageType.Magical);
+        local T = TargetSelector.GetTarget(E.range, DamageType.Magical);
         if T then
             if T:IsValidTarget(E.range) then
-                local Pred = Q:GetPrediction(T);
+                local Pred = E:GetPrediction(T);
                 if Pred and Pred.hitchance >= HitChance.High then
                     if My.position:Distance(Pred.castPosition) <= E.range then
                         E:Cast(Pred.castPosition);
